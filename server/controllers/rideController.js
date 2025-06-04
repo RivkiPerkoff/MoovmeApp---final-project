@@ -3,7 +3,8 @@ const Ride = require('../models/Ride');
 // Get all rides
 const getAllRides = async (req, res) => {
   try {
-    const rides = await Ride.find().populate('driver');
+    // populate driver_id instead of driver
+    const rides = await Ride.find().populate('driver_id', '-password'); // אפשר להוציא סיסמה מההחזרה
     res.json(rides);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -13,7 +14,7 @@ const getAllRides = async (req, res) => {
 // Get ride by ID
 const getRideById = async (req, res) => {
   try {
-    const ride = await Ride.findById(req.params.id).populate('driver');
+    const ride = await Ride.findById(req.params.id).populate('driver_id', '-password');
     if (!ride) return res.status(404).json({ message: 'Ride not found' });
     res.json(ride);
   } catch (err) {
@@ -22,15 +23,36 @@ const getRideById = async (req, res) => {
 };
 
 // Create ride
+// const createRide = async (req, res) => {
+//   try {
+//     const rideData = {
+//       ...req.body,
+//       driver_id: req.user._id // להגדיר את הנהג אוטומטית לפי המשתמש המחובר
+//     };
+//     const newRide = new Ride(rideData);
+//     const savedRide = await newRide.save();
+//     res.status(201).json(savedRide);
+//   } catch (err) {
+//     res.status(400).json({ message: err.message });
+//   }
+// };
 const createRide = async (req, res) => {
-  const newRide = new Ride(req.body);
   try {
+    const rideData = {
+      ...req.body,
+      driver_id: req.body.driver_id  // השתמש ב-driver_id שמגיע בגוף הבקשה
+    };
+    const newRide = new Ride(rideData);
     const savedRide = await newRide.save();
     res.status(201).json(savedRide);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
+
+
+
+
 
 // Update ride
 const updateRide = async (req, res) => {
