@@ -50,10 +50,6 @@ const createRide = async (req, res) => {
   }
 };
 
-
-
-
-
 // Update ride
 const updateRide = async (req, res) => {
   try {
