@@ -64,13 +64,25 @@ const updateRide = async (req, res) => {
 // Delete ride
 const deleteRide = async (req, res) => {
   try {
-    const deleted = await Ride.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ message: 'Ride not found' });
-    res.json({ message: 'Ride deleted' });
+    const ride = await Ride.findById(req.params.id);
+
+    if (!ride) {
+      return res.status(404).json({ message: 'נסיעה לא נמצאה' });
+    }
+
+    if (ride.driver_id.toString() !== req.user._id) {
+      return res.status(403).json({ message: 'אין הרשאה למחוק נסיעה זו' });
+    }
+
+    await ride.deleteOne();
+    res.status(200).json({ message: 'הנסיעה נמחקה בהצלחה' });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error(err);
+    res.status(500).json({ message: 'שגיאה במחיקת נסיעה' });
   }
 };
+
+
 
 module.exports = {
   getAllRides,
