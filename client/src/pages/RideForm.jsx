@@ -1,6 +1,8 @@
 import { useState, useContext, useEffect } from 'react';
 import axios from '../services/axiosInstance';
 import { AuthContext } from '../context/AuthContext';
+import './RideForm.css';
+
 
 const RideForm = ({ onClose, onRideAdded, initialRide = null }) => {
   const { user, token } = useContext(AuthContext);

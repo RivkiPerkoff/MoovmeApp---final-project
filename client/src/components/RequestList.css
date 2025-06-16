@@ -1,0 +1,27 @@
+.request-section {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-top: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.request-title {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.request-list {
+  list-style: none;
+  padding: 0;
+}
+
+.request-item {
+  margin-bottom: 1rem;
+  background: #f4f7ff;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid #cfdcff;
+}

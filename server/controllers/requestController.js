@@ -2,7 +2,6 @@ const Request = require('../models/Request');
 const Ride = require('../models/Ride');
 
 
-
 // Get all requests
 const getAllRequests = async (req, res) => {
   try {
@@ -12,6 +11,28 @@ const getAllRequests = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+const getRequestsByPassenger = async (req, res) => {
+  try {
+    const passengerId = req.params.passengerId;
+    const requests = await Request.find({ passenger_id: passengerId })
+      .populate({
+        path: 'ride_id',
+        model: 'Ride',
+      });
+
+    // נעדכן את הפורמט שיחזור עם ride במקום ride_id
+    const updatedRequests = requests.map((req) => ({
+      ...req._doc,
+      ride: req.ride_id, // נוסיף ride כדי שיהיה נגיש בקומפוננטה
+    }));
+
+    res.json(updatedRequests);
+  } catch (err) {
+    res.status(500).json({ message: 'שגיאה בשליפת בקשות של נוסע', error: err.message });
+  }
+};
+
+
 
 // Get one request by ID
 const getRequestById = async (req, res) => {
@@ -85,10 +106,19 @@ const updateRequest = async (req, res) => {
 // Delete request
 const deleteRequest = async (req, res) => {
   try {
+    console.log('--- מחיקת בקשה ---');
+    console.log('params.id:', req.params.id);
+    console.log('body:', req.body);
+
     const deleted = await Request.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ message: 'Request not found' });
+    if (!deleted) {
+      console.log('לא נמצאה בקשה למחיקה');
+      return res.status(404).json({ message: 'Request not found' });
+    }
+    console.log('הבקשה נמחקה בהצלחה');
     res.json({ message: 'Request deleted' });
   } catch (err) {
+    console.error('שגיאה במחיקת בקשה:', err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -104,6 +134,25 @@ const getRequestsByRide = async (req, res) => {
   }
 };
 
+const increaseSeats = async (req, res) => {
+  const rideId = req.params.id;
+  const { seatsToAdd } = req.body;
+
+  try {
+    const ride = await Ride.findById(rideId);
+    if (!ride) {
+      return res.status(404).json({ message: 'Ride not found' });
+    }
+
+    ride.available_seats += seatsToAdd;
+    await ride.save();
+
+    res.json({ message: 'Seats updated successfully', ride });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getAllRequests,
   getRequestById,
@@ -111,4 +160,5 @@ module.exports = {
   updateRequest,
   deleteRequest,
   getRequestsByRide,
+  getRequestsByPassenger,
 };

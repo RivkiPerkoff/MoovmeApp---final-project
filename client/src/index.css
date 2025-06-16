@@ -4,6 +4,16 @@ body {
   color: #333;
 }
 
+.home-background {
+  background-image: url('./images/bg-home.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  padding: 2rem;
+  color:#00c2ff;
+}
+
 .container {
   max-width: 800px;
   margin: auto;

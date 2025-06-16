@@ -70,7 +70,10 @@ const deleteRide = async (req, res) => {
       return res.status(404).json({ message: 'נסיעה לא נמצאה' });
     }
 
-    if (ride.driver_id.toString() !== req.user._id) {
+    // החלף ל-body אם אין לך auth middleware
+    const requesterId = req.body.userId;
+
+    if (!requesterId || ride.driver_id.toString() !== requesterId) {
       return res.status(403).json({ message: 'אין הרשאה למחוק נסיעה זו' });
     }
 
@@ -83,6 +86,25 @@ const deleteRide = async (req, res) => {
 };
 
 
+const increaseSeats = async (req, res) => {
+  const rideId = req.params.id;
+  const { seatsToAdd } = req.body;
+
+  try {
+    const ride = await Ride.findById(rideId);
+    if (!ride) {
+      return res.status(404).json({ message: 'Ride not found' });
+    }
+
+    ride.available_seats += seatsToAdd;
+    await ride.save();
+
+    res.json({ message: 'Seats updated successfully', ride });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 module.exports = {
   getAllRides,
@@ -90,4 +112,5 @@ module.exports = {
   createRide,
   updateRide,
   deleteRide,
+  increaseSeats,
 };

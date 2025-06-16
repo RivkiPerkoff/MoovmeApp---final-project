@@ -1,3 +1,56 @@
+
+/* App.css */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+  min-height: 100vh;
+  direction: rtl; /* תמיכה בעברית */
+}
+
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem 1rem;
+}
+
+/* קישור בסיסי */
+a {
+  text-decoration: none;
+  color: #0047a8;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* כפתור כללי */
+button {
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+/* סגנון טפסים כללי */
+input, select, textarea {
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+
+
+
+
+
+
+
 .App {
   text-align: center;
 }

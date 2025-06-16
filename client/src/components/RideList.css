@@ -1,0 +1,14 @@
+.ride-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.ride-list .ride-card {
+  transition: box-shadow 0.2s ease;
+}
+
+.ride-list .ride-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}

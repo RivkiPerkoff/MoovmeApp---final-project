@@ -1,0 +1,30 @@
+.ride-card {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: transform 0.2s ease;
+}
+
+.ride-card:hover {
+  transform: translateY(-4px);
+}
+
+.ride-card h3 {
+  color: #0055ff;
+  margin-bottom: 0.5rem;
+}
+
+.ride-card .btn {
+  margin-right: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.request-section {
+  margin-top: 1rem;
+  background-color: #f9f9f9;
+  border-top: 1px solid #ccc;
+  padding-top: 1rem;
+  border-radius: 0.5rem;
+}

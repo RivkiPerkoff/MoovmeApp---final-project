@@ -1,9 +1,11 @@
-
 import { useEffect, useState, useContext } from 'react';
 import axios from '../services/axiosInstance';
 import { AuthContext } from '../context/AuthContext';
-import { Link } from 'react-router-dom';
 import RideForm from './RideForm';
+import RideList from '../components/RideList';
+import MessageBanner from '../components/MessageBanner';
+import LoadingIndicator from '../components/LoadingIndicator';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const { user } = useContext(AuthContext);
@@ -14,6 +16,7 @@ const Home = () => {
   const [message, setMessage] = useState('');
   const [rideToEdit, setRideToEdit] = useState(null);
   const [requestsByRide, setRequestsByRide] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRides = async () => {
@@ -51,12 +54,28 @@ const Home = () => {
 
   const handleDeleteRide = async (rideId) => {
     try {
-      await axios.delete(`/api/rides/${rideId}`);
+      // await axios.delete(`/api/rides/${rideId}`);
+     await axios.delete(`/api/rides/${rideId}`, {
+        data: { userId: user._id } // שליחת userId ב-body
+      });
       setAllRides((prev) => prev.filter((ride) => ride._id !== rideId));
       setMessage('✅ הנסיעה נמחקה בהצלחה.');
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
       console.error('שגיאה במחיקת נסיעה:', err);
+      if (err.response) {
+        // שרת החזיר תשובה עם קוד שגיאה
+        console.error('Response data:', err.response.data);
+        console.error('Response status:', err.response.status);
+        console.error('Response headers:', err.response.headers);
+      } else if (err.request) {
+        // הבקשה נשלחה אך לא התקבלה תשובה
+        console.error('Request:', err.request);
+      } else {
+        // שגיאה בהגדרת הבקשה
+        console.error('Error message:', err.message);
+      }
+      
       setMessage('❌ שגיאה במחיקת נסיעה.');
       setTimeout(() => setMessage(''), 3000);
     }
@@ -66,124 +85,87 @@ const Home = () => {
   const otherRides = allRides.filter(ride => ride.driver_id?._id !== user?._id);
 
   return (
-    <div className="container">
-      <h1>ברוך הבא{user ? `, ${user.username}` : ''}!</h1>
-      <p>מצא נסיעה שמתאימה לך או פרסם אחת חדשה.</p>
+    <div className="home-background">
+      <div className="container">
+        <h1>ברוך הבא{user ? `, ${user.username}` : ''}!</h1>
+        <p>מצא נסיעה שמתאימה לך או פרסם אחת חדשה.</p>
 
-      <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-        <button className="btn btn-primary" onClick={() => {
-          setRideToEdit(null);
-          setShowForm(true);
-        }}>
-          + פרסם נסיעה חדשה
-        </button>
+        <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+          <button className="btn btn-primary" onClick={() => {
+            setRideToEdit(null);
+            setShowForm(true);
+          }}>
+            + פרסם נסיעה חדשה
+          </button>
 
-        <button
-          onClick={() => setShowMyRides(prev => !prev)}
-          style={{ marginRight: '1rem' }}
-        >
-          {showMyRides ? 'הסתר את הנסיעות שלי' : 'הצג את הנסיעות שלי'}
-        </button>
-      </div>
+          <button
+            onClick={() => setShowMyRides(prev => !prev)}
+            style={{ marginRight: '1rem' }}
+          >
+            {showMyRides ? 'הסתר את הנסיעות שלי' : 'הצג את הנסיעות שלי'}
+          </button>
+          <button
+            onClick={() => navigate('/my-joined-rides')}
+            style={{ marginRight: '1rem' }}
+          >
+            היסטוריית נסיעות שלי
+          </button>
 
-      {message && <div style={{ color: 'red', fontWeight: 'bold' }}>{message}</div>}
-
-      <hr />
-
-      {loading ? (
-        <p>טוען נסיעות...</p>
-      ) : (
-        <>
-          {showMyRides && (
-            <>
-              <h2>הנסיעות שלי</h2>
-              {myRides.length === 0 ? (
-                <p>לא פרסמת נסיעות עדיין.</p>
-              ) : (
-                <div className="ride-list">
-                  {myRides.map(ride => (
-                    <div key={ride._id} className="ride-card">
-                      <h3>{ride.from} → {ride.to}</h3>
-                      <p>תאריך: {new Date(ride.departure_time).toLocaleString('he-IL')}</p>
-                      <p>מקומות פנויים: {ride.available_seats}</p>
-                      <Link to={`/rides/${ride._id}`}>לפרטים</Link>
-                      <button
-                        onClick={() => handleDeleteRide(ride._id)}
-                        className="btn btn-danger"
-                        style={{ marginTop: '0.5rem', marginRight: '0.5rem' }}
-                      >
-                        🗑️ מחק נסיעה
-                      </button>
-                      <button
-                        onClick={() => {
-                          setRideToEdit(ride);
-                          setShowForm(true);
-                        }}
-                        className="btn btn-warning"
-                        style={{ marginTop: '0.5rem', marginRight: '0.5rem' }}
-                      >
-                        ✏️ ערוך נסיעה
-                      </button>
-                      {requestsByRide[ride._id]?.length > 0 && (
-                        <div>
-                          <strong>בקשות להצטרפות:</strong>
-                          <ul>
-                            {requestsByRide[ride._id].map(req => (
-                              <li key={req._id}>
-                                {req.passenger_id.username} ביקש {req.seats_requested} מקומות - סטטוס: {req.status}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-              <hr />
-            </>
-          )}
-
-          <h2>נסיעות זמינות</h2>
-          {otherRides.length === 0 ? (
-            <p>אין כרגע נסיעות זמינות ממשתמשים אחרים.</p>
-          ) : (
-            <div className="ride-list">
-              {otherRides.map(ride => (
-                <div key={ride._id} className="ride-card">
-                  <h3>{ride.from} → {ride.to}</h3>
-                  <p>תאריך: {new Date(ride.departure_time).toLocaleString('he-IL')}</p>
-                  <p>מקומות פנויים: {ride.available_seats}</p>
-                  <Link to={`/rides/${ride._id}`}>לפרטים</Link>
-                </div>
-              ))}
-            </div>
-          )}
-        </>
-      )}
-
-      {showForm && (
-        <div className="modal-overlay" onClick={() => setShowForm(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowForm(false)} style={{ float: 'left' }}>❌</button>
-            <RideForm
-              onClose={() => setShowForm(false)}
-              initialRide={rideToEdit}
-              onRideAdded={(newRide) => {
-                if (rideToEdit) {
-                  setAllRides((prev) =>
-                    prev.map(r => r._id === newRide._id ? newRide : r)
-                  );
-                } else {
-                  setAllRides((prev) => [...prev, newRide]);
-                }
-                setShowForm(false);
-                setRideToEdit(null);
-              }}
-            />
-          </div>
         </div>
-      )}
+
+        <MessageBanner message={message} type={message.includes('❌') ? 'error' : 'success'} />
+
+        <hr />
+
+        {loading ? (
+          <LoadingIndicator />
+        ) : (
+          <>
+            {showMyRides && (
+              <>
+                <h2>הנסיעות שלי</h2>
+                <RideList
+                  rides={myRides}
+                  isMine={true}
+                  onEdit={(ride) => {
+                    setRideToEdit(ride);
+                    setShowForm(true);
+                  }}
+                  onDelete={handleDeleteRide}
+                  requestsByRide={requestsByRide}
+                />
+                <hr />
+              </>
+            )}
+
+            <h2>נסיעות זמינות</h2>
+            <RideList rides={otherRides} />
+          </>
+        )}
+
+        {showForm && (
+          <div className="modal-overlay" onClick={() => setShowForm(false)}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+              <button onClick={() => setShowForm(false)} style={{ float: 'left' }}>❌</button>
+              <RideForm
+                onClose={() => setShowForm(false)}
+                initialRide={rideToEdit}
+                onRideAdded={(newRide) => {
+                  if (rideToEdit) {
+                    setAllRides((prev) =>
+                      prev.map(r => r._id === newRide._id ? newRide : r)
+                    );
+                  } else {
+                    setAllRides((prev) => [...prev, newRide]);
+                  }
+                  setShowForm(false);
+                  setRideToEdit(null);
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

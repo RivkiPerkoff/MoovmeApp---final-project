@@ -1,0 +1,90 @@
+.my-requests-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.my-requests-container h2 {
+  text-align: center;
+  color: #0047a8;
+  margin-bottom: 1.5rem;
+}
+
+.request-list {
+  list-style: none;
+  padding: 0;
+}
+
+.request-item {
+  background-color: #f0f4ff;
+  border: 1px solid #cbd6ee;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: box-shadow 0.3s ease;
+}
+
+.request-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.request-item p {
+  margin: 0.5rem 0;
+}
+
+.request-status {
+  font-weight: bold;
+}
+
+.request-status.pending {
+  color: #ff9800;
+}
+
+.request-status.approved {
+  color: #4caf50;
+}
+
+.request-status.rejected {
+  color: #f44336;
+}
+
+.request-item button {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #dc3545;
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+.request-item button:hover {
+  background-color: #c82333;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .my-requests-container {
+    padding: 1rem;
+  }
+
+  .request-item {
+    padding: 1rem;
+  }
+}
