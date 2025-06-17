@@ -8,30 +8,42 @@ const RideForm = ({ onClose, onRideAdded, initialRide = null }) => {
   const { user, token } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
-    from: '',
-    to: '',
+
+    from_city: '',
+    from_address: '',
+    destination_city: '',
+    destination_address: '',
     departure_time: '',
     available_seats: '',
-    notes: ''
+    notes: '',
+    gender: 'נהג'
+    
   });
 
   useEffect(() => {
     if (initialRide) {
       setFormData({
-        from: initialRide.from || '',
-        to: initialRide.to || '',
+
+        from_city: initialRide.from_city || '',
+        from_address: initialRide.from_address || '',    
+        destination_city: initialRide.destination_city || '',
+        destination_address: initialRide.destination_address || '',
         departure_time: initialRide.departure_time?.slice(0, 16) || '',
         available_seats: initialRide.available_seats || '',
-        notes: initialRide.notes || ''
+        notes: initialRide.notes || '',
+        gender: initialRide.gender || 'נהג'
       });
     } else {
       // טופס חדש - אפס שדות
       setFormData({
-        from: '',
-        to: '',
+        from_city: '',
+        from_address: '',
+        destination_city: '',
+        destination_address: '',
         departure_time: '',
         available_seats: '',
-        notes: ''
+        notes: '',
+        gender: 'נהג'
       });
     }
   }, [initialRide]);
@@ -77,30 +89,83 @@ const RideForm = ({ onClose, onRideAdded, initialRide = null }) => {
     }
   };
 
+  // מערך של ערים
+  const charediCities = [
+    "בני ברק", "ירושלים", "אלעד","אחיסמך","בית שמש", "מודיעין עילית", "ביתר עילית", "בית שמש",
+    "אשדוד", "צפת", "חיפה", "נתיבות", "קרית גת", "קרית מלאכי", "טבריה", "ערד",
+    "חצור הגלילית", "רכסים", "עמנואל", "ביתר", "חולון", "פתח תקווה",
+    "ראשון לציון", "אשקלון", "עפולה", "קרית יערים", "נוף הגליל",
+     "אופקים", "בית דגן", "גבעת זאב", "קרית ספר", "אחר"
+  ];
+
   return (
     <div>
       <h2>{initialRide ? '✏️ עריכת נסיעה' : 'פרסום נסיעה חדשה'}</h2>
       <form onSubmit={handleSubmit}>
+ 
         <div>
-          <label>מוצא:</label>
-          <input type="text" name="from" value={formData.from} onChange={handleChange} required />
+          <label>עיר מוצא:</label>
+          <select
+            name="from_city"
+            value={formData.from_city || ''}
+            onChange={handleChange}
+            required
+          >
+            <option value="">בחר עיר</option>
+            {charediCities.map(city => (
+              <option key={city} value={city}>{city}</option>
+            ))}
+          </select>
         </div>
+        <div>
+          <label>כתובת מוצא:</label>
+          <input 
+            type="text" 
+            name="from_address" 
+            value={formData.from_address} 
+            onChange={handleChange} 
+            required 
+          />
+        </div>
+     <div>
+  <label>עיר יעד:</label>
+  <select
+    name="destination_city"
+    value={formData.destination_city || ''}
+    onChange={handleChange}
+    required
+  >
+    <option value="">בחר עיר</option>
+    {charediCities.map(city => (
+      <option key={city} value={city}>{city}</option>
+    ))}
+  </select>
+</div>
 
         <div>
-          <label>יעד:</label>
-          <input type="text" name="to" value={formData.to} onChange={handleChange} required />
+          <label>כתובת יעד:</label>
+          <input type="text" name="destination_address" value={formData.destination_address} onChange={handleChange} required />
         </div>
-
         <div>
           <label>זמן יציאה:</label>
           <input type="datetime-local" name="departure_time" value={formData.departure_time} onChange={handleChange} required />
         </div>
-
         <div>
           <label>מקומות פנויים:</label>
-          <input type="number" name="available_seats" value={formData.available_seats} onChange={handleChange} required min="1" />
+          <input type="number" name="available_seats" value={formData.available_seats} min="1" max="20" onChange={handleChange} required  />
         </div>
-
+        <div>
+          <select
+            name="gender"
+            value={formData.gender}
+            onChange={handleChange}
+            required
+            style={{ width: '100%' }}
+          >
+            <option value="נהג">נהג</option>
+            <option value="נהגת">נהגת</option>
+          </select>
+        </div>
         <div>
           <label>הערות:</label>
           <textarea name="notes" value={formData.notes} onChange={handleChange} />

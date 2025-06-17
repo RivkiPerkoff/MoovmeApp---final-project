@@ -5,9 +5,10 @@ import RideForm from './RideForm';
 import RideList from '../components/RideList';
 import MessageBanner from '../components/MessageBanner';
 import LoadingIndicator from '../components/LoadingIndicator';
-import NotificationsPanel from '../components/NotificationsPanel'; // או הנתיב שבו תשימי את הקובץ
+import NotificationsPanel from '../components/NotificationsPanel';
+import RideFilter from '../components/RideFilter';
 import { useNavigate } from 'react-router-dom';
-import './Home.css'
+import './Home.css';
 
 const Home = () => {
   const { user } = useContext(AuthContext);
@@ -22,7 +23,7 @@ const Home = () => {
   const [visibleToasts, setVisibleToasts] = useState([]);
   const unreadCount = notifications.filter(n => !n.seen && !n.is_read).length;
   const [showAllNotifications, setShowAllNotifications] = useState(false);
-
+  const [filterParams, setFilterParams] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,12 +40,21 @@ const Home = () => {
     fetchRides();
   }, []);
 
+  const now = new Date();
+
+  const myRides = allRides.filter(
+    ride => ride.driver_id?._id === user?._id && new Date(ride.departure_time) > now
+  );
+
+  const otherRides = allRides.filter(
+    ride => ride.driver_id?._id !== user?._id && new Date(ride.departure_time) > now
+  );
+
   useEffect(() => {
     const fetchRequests = async () => {
       const all = await Promise.all(
         myRides.map(async (ride) => {
           const res = await axios.get(`/api/requests/byRide/${ride._id}`);
-
           return { rideId: ride._id, requests: res.data };
         })
       );
@@ -63,9 +73,6 @@ const Home = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        console.log('USER:', user);
-        console.log('USER._id:', user?._id);
-
         const res = await axios.get(`/api/notifications/byUser/${user?._id}`);
         setNotifications(res.data);
       } catch (err) {
@@ -80,19 +87,16 @@ const Home = () => {
 
   useEffect(() => {
     const unread = notifications.filter(n => !n.seen && !n.is_read);
-
     unread.forEach((notif) => {
       const alreadyVisible = visibleToasts.find(t => t._id === notif._id);
       if (!alreadyVisible) {
         setVisibleToasts(prev => [...prev, notif]);
-
         setTimeout(() => {
           setVisibleToasts(prev => prev.filter(t => t._id !== notif._id));
-        }, 10000); // נעלם אחרי 10 שניות
+        }, 10000);
       }
     });
   }, [notifications]);
-
 
   const handleMarkAsSeen = async (notificationId) => {
     try {
@@ -109,7 +113,7 @@ const Home = () => {
   const handleDeleteRide = async (rideId) => {
     try {
       await axios.delete(`/api/rides/${rideId}`, {
-        data: { userId: user._id } // שליחת userId ב-body
+        data: { userId: user._id }
       });
       setAllRides((prev) => prev.filter((ride) => ride._id !== rideId));
       setMessage('✅ הנסיעה נמחקה בהצלחה.');
@@ -117,32 +121,30 @@ const Home = () => {
     } catch (err) {
       console.error('שגיאה במחיקת נסיעה:', err);
       if (err.response) {
-        // שרת החזיר תשובה עם קוד שגיאה
         console.error('Response data:', err.response.data);
         console.error('Response status:', err.response.status);
         console.error('Response headers:', err.response.headers);
       } else if (err.request) {
-        // הבקשה נשלחה אך לא התקבלה תשובה
         console.error('Request:', err.request);
       } else {
-        // שגיאה בהגדרת הבקשה
         console.error('Error message:', err.message);
       }
-
       setMessage('❌ שגיאה במחיקת נסיעה.');
       setTimeout(() => setMessage(''), 3000);
     }
   };
 
-  const now = new Date();
-
-  const myRides = allRides.filter(
-    ride => ride.driver_id?._id === user?._id && new Date(ride.departure_time) > now
-  );
-
-  const otherRides = allRides.filter(
-    ride => ride.driver_id?._id !== user?._id && new Date(ride.departure_time) > now
-  );
+  const filteredRides = otherRides.filter((ride) => {
+    if (!filterParams) return true;
+    const { from_city, destination_city, genders, minSeats, date } = filterParams;
+    return (
+      (!from_city || ride.from_city === from_city) &&
+      (!destination_city || ride.destination_city === destination_city) &&
+      (!genders || genders.length === 0 || genders.includes(ride.gender)) &&
+      (!minSeats || ride.available_seats >= parseInt(minSeats)) &&
+      (!date || new Date(ride.departure_time).toISOString().split('T')[0] === date)
+    );
+  });
 
   return (
     <div className="home-background">
@@ -159,90 +161,86 @@ const Home = () => {
           onMarkAsSeen={handleMarkAsSeen}
           refreshNotifications={() => {
             axios.get(`/api/notifications/byUser/${user._id}`).then(res => setNotifications(res.data));
-            axios.get('/api/rides').then(res => setAllRides(res.data)); // ← זה שורה חדשה
+            axios.get('/api/rides').then(res => setAllRides(res.data));
           }}
-
         />
 
+        <div className="container-flex">
+          <RideFilter onFilter={setFilterParams} />
 
-        <div className="container">
-          <h1>ברוך הבא{user ? `, ${user.username}` : ''}!</h1>
-          <p>מצא נסיעה שמתאימה לך או פרסם אחת חדשה.</p>
+          <div className="main-content">
+            <h1>ברוך הבא{user ? `, ${user.username}` : ''}!</h1>
+            <p>מצא נסיעה שמתאימה לך או פרסם אחת חדשה.</p>
 
-          <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-            <button className="btn btn-primary" onClick={() => {
-              setRideToEdit(null);
-              setShowForm(true);
-            }}>
-              + פרסם נסיעה חדשה
-            </button>
+            <div className="button-group">
+              <button className="btn btn-primary" onClick={() => {
+                setRideToEdit(null);
+                setShowForm(true);
+              }}>
+                + פרסם נסיעה חדשה
+              </button>
 
-            <button
-              onClick={() => setShowMyRides(prev => !prev)}
-              style={{ marginRight: '1rem' }}
-            >
-              {showMyRides ? 'הסתר את הנסיעות שלי' : 'הצג את הנסיעות שלי'}
-            </button>
-            <button
-              onClick={() => navigate('/my-joined-rides')}
-              style={{ marginRight: '1rem' }}
-            >
-              היסטוריית נסיעות שלי
-            </button>
-          </div>
+              <button onClick={() => setShowMyRides(prev => !prev)} style={{ marginRight: '1rem' }}>
+                {showMyRides ? 'הסתר את הנסיעות שלי' : 'הצג את הנסיעות שלי'}
+              </button>
 
-          <MessageBanner message={message} type={message.includes('❌') ? 'error' : 'success'} />
-
-          <hr />
-
-          {loading ? (
-            <LoadingIndicator />
-          ) : (
-            <>
-              {showMyRides && (
-                <>
-                  <h2>הנסיעות שלי</h2>
-                  <RideList
-                    rides={myRides}
-                    isMine={true}
-                    onEdit={(ride) => {
-                      setRideToEdit(ride);
-                      setShowForm(true);
-                    }}
-                    onDelete={handleDeleteRide}
-                    requestsByRide={requestsByRide}
-                  />
-                  <hr />
-                </>
-              )}
-
-              <h2>נסיעות זמינות</h2>
-              <RideList rides={otherRides} />
-            </>
-          )}
-
-          {showForm && (
-            <div className="modal-overlay" onClick={() => setShowForm(false)}>
-              <div className="modal-content" onClick={e => e.stopPropagation()}>
-                <button onClick={() => setShowForm(false)} style={{ float: 'left' }}>❌</button>
-                <RideForm
-                  onClose={() => setShowForm(false)}
-                  initialRide={rideToEdit}
-                  onRideAdded={(newRide) => {
-                    if (rideToEdit) {
-                      setAllRides((prev) =>
-                        prev.map(r => r._id === newRide._id ? newRide : r)
-                      );
-                    } else {
-                      setAllRides((prev) => [...prev, newRide]);
-                    }
-                    setShowForm(false);
-                    setRideToEdit(null);
-                  }}
-                />
-              </div>
+              <button onClick={() => navigate('/my-joined-rides')} style={{ marginRight: '1rem' }}>
+                היסטוריית נסיעות שלי
+              </button>
             </div>
-          )}
+
+            <MessageBanner message={message} type={message.includes('❌') ? 'error' : 'success'} />
+            <hr />
+
+            {loading ? (
+              <LoadingIndicator />
+            ) : (
+              <>
+                {showMyRides && (
+                  <>
+                    <h2>הנסיעות שלי</h2>
+                    <RideList
+                      rides={myRides}
+                      isMine={true}
+                      onEdit={(ride) => {
+                        setRideToEdit(ride);
+                        setShowForm(true);
+                      }}
+                      onDelete={handleDeleteRide}
+                      requestsByRide={requestsByRide}
+                    />
+                    <hr />
+                  </>
+                )}
+
+                <h2>נסיעות זמינות</h2>
+                <RideList rides={filteredRides} />
+              </>
+            )}
+
+            {showForm && (
+              <div className="modal-overlay" onClick={() => setShowForm(false)}>
+                <div className="modal-content" onClick={e => e.stopPropagation()}>
+                  <button onClick={() => setShowForm(false)} style={{ float: 'left' }}>❌</button>
+                  <RideForm
+                    onClose={() => setShowForm(false)}
+                    initialRide={rideToEdit}
+                    onRideAdded={(newRide) => {
+                      if (rideToEdit) {
+                        setAllRides((prev) =>
+                          prev.map(r => r._id === newRide._id ? newRide : r)
+                        );
+                      } else {
+                        setAllRides((prev) => [...prev, newRide]);
+                      }
+                      setShowForm(false);
+                      setRideToEdit(null);
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

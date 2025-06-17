@@ -59,12 +59,14 @@ const handleRequest = async () => {
       <h2>פרטי נסיעה</h2>
 
       <MessageBanner message={message} type={message.includes('❌') ? 'error' : 'success'} />
-
-      <p><strong>מ:</strong> {ride.from}</p>
-      <p><strong>אל:</strong> {ride.to}</p>
+      <p><strong>עיר מוצא:</strong> {ride.from_city}</p>
+      <p><strong>כתובת מוצא:</strong> {ride.from_address}</p>
+      <p><strong>עיר יעד:</strong> {ride.destination_city}</p>
+      <p><strong>כתובת יעד:</strong> {ride.destination_address}</p>
       <p><strong>שעה:</strong> {new Date(ride.departure_time).toLocaleString('he-IL')}</p>
       <p><strong>מקומות פנויים:</strong> {ride.available_seats}</p>
       <p><strong>נהג:</strong> {ride.driver_id?.username}</p>
+      <p>{ride.gender === 'נהג' ? 'נהג' : 'נהגת'}</p>
 
       {user && user._id !== ride.driver_id?._id && (
         <div className="request-form">

@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 
 const RideCard = ({ ride, isMine, onEdit, onDelete, requests }) => (
   <div className="ride-card">
-    <h3>{ride.from} ⬅ {ride.to}</h3>
+    <h3>
+       {ride.from_city} ⬅ {ride.destination_city}
+    </h3>
     <p>תאריך: {new Date(ride.departure_time).toLocaleString('he-IL')}</p>
     <p>מקומות פנויים: {ride.available_seats}</p>
     <Link to={`/rides/${ride._id}`}>לפרטים</Link>
