@@ -22,20 +22,7 @@ const getRideById = async (req, res) => {
   }
 };
 
-// Create ride
-// const createRide = async (req, res) => {
-//   try {
-//     const rideData = {
-//       ...req.body,
-//       driver_id: req.user._id // להגדיר את הנהג אוטומטית לפי המשתמש המחובר
-//     };
-//     const newRide = new Ride(rideData);
-//     const savedRide = await newRide.save();
-//     res.status(201).json(savedRide);
-//   } catch (err) {
-//     res.status(400).json({ message: err.message });
-//   }
-// };
+
 const createRide = async (req, res) => {
   try {
     const rideData = {

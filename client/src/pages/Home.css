@@ -1,0 +1,25 @@
+.home-background {
+  background-color: #f0f8ff;
+  min-height: 100vh;
+}
+
+.container-flex {
+  display: flex;
+  align-items: flex-start;
+  padding: 2rem;
+  gap: 2rem;
+}
+
+.main-content {
+  flex: 1;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+button {
+  cursor: pointer;
+}
