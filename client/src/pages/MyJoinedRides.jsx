@@ -6,6 +6,8 @@ import './MyJoinedRides.css';
 const MyJoinedRides = () => {
     const { user } = useContext(AuthContext);
     const [requests, setRequests] = useState([]);
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [cancelData, setCancelData] = useState(null);
 
     useEffect(() => {
         const fetchJoinedRides = async () => {
@@ -22,20 +24,29 @@ const MyJoinedRides = () => {
         }
     }, [user]);
 
-    const handleCancelRequest = async (requestId, rideId, seats) => {
-        try {
-            await axios.delete(`/api/requests/${requestId}`, {
-                data: { userId: user._id }
-            }); 
-            await axios.put(`/api/rides/${rideId}/increaseSeats`, {
-                seatsToAdd: seats,
-            });
-
-            setRequests(prev => prev.filter(r => r._id !== requestId));
-        } catch (err) {
-            console.error("שגיאה בביטול בקשה:", err);
-        }
+    const confirmCancel = (requestId, rideId, seatsRequested) => {
+        setCancelData({ requestId, rideId, seatsRequested });
+        setShowConfirm(true);
     };
+
+const handleCancelRequest = async () => {
+    if (!cancelData) return;
+    const { requestId, rideId, seatsRequested } = cancelData;
+
+    try {
+        await axios.delete(`/api/requests/${requestId}`);
+        await axios.put(`/api/requests/${rideId}/increaseSeats`, {
+            seatsToAdd: seatsRequested
+        });
+        setRequests(prev => prev.filter(r => r._id !== requestId));
+        setShowConfirm(false); // סגירת המודאל לאחר הצלחה
+    } catch (error) {
+        console.error("שגיאה בביטול הבקשה", error);
+    }
+};
+
+
+
 
     return (
         <div className="joined-rides-container">
@@ -48,29 +59,45 @@ const MyJoinedRides = () => {
                     const isFutureRide = new Date(ride?.departure_time) > new Date();
 
                     return (
-                        <div key={req._id} className="ride-card">
-                            <h3>מ: {ride?.from} ל: {ride?.to}</h3>
-                            <p><span className="info-bold">תאריך:</span> {new Date(ride?.departure_time).toLocaleString()}</p>
-                            <p><span className="info-bold">מקומות שתפסת:</span> {req.seats_requested}</p>
-                            <p><span className="info-bold">הערות:</span> {ride?.notes || 'אין הערות'}</p>
-                            {ride?.car_img && (
-                                <img src={ride.car_img} alt="תמונה של הרכב" />
-                            )}
+                        <React.Fragment key={req._id}>
+                            <div className="ride-card">
+                                <h3>מ: {ride?.from} ל: {ride?.to}</h3>
+                                <p><span className="info-bold">תאריך:</span> {new Date(ride?.departure_time).toLocaleString()}</p>
+                                <p><span className="info-bold">מקומות שתפסת:</span> {req.seats_requested}</p>
+                                <p><span className="info-bold">הערות:</span> {ride?.notes || 'אין הערות'}</p>
+                                {ride?.car_img && (
+                                    <img src={ride.car_img} alt="תמונה של הרכב" />
+                                )}
 
-                            {isFutureRide && (
-                                <button
-                                    className="btn-cancel"
-                                    onClick={() => handleCancelRequest(req._id, ride._id, req.seats_requested)}
-                                >
-                                    בטל הצטרפות
-                                </button>
+                                {isFutureRide && (
+                                    <button
+                                        className="btn-cancel"
+                                        onClick={() => confirmCancel(req._id, ride._id, req.seats_requested)}
+                                    >
+                                        בטל הצטרפות
+                                    </button>
+                                )}
+                            </div>
+
+                            {showConfirm && cancelData?.requestId === req._id && (
+                                <div className="modal-overlay">
+                                    <div className="modal-content">
+                                        <p>האם אתה בטוח שברצונך לבטל את ההצטרפות?</p>
+                                        <div className="modal-buttons">
+                                            <button onClick={() => handleCancelRequest()} className="btn-confirm">כן, בטל</button>
+                                            <button onClick={() => setShowConfirm(false)} className="btn-cancel">ביטול</button>
+                                        </div>
+                                    </div>
+                                </div>
                             )}
-                        </div>
+                        </React.Fragment>
                     );
                 })
             )}
         </div>
     );
+
+
 };
 
 export default MyJoinedRides;

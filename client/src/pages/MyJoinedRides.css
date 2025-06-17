@@ -58,3 +58,49 @@
 .ride-card .info-bold {
   font-weight: bold;
 }
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px gray;
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+}
+
+.modal-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-actions button {
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modal-actions button:first-child {
+  background-color: #d9534f;
+  color: white;
+}
+
+.modal-actions button:last-child {
+  background-color: #5bc0de;
+  color: white;
+}
