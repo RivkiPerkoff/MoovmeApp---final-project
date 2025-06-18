@@ -1,10 +1,10 @@
-import axios from './axiosInstance'; // אם באותה תיקייה
+import axios from './axiosInstance';
 
 export const login = async (credentials) => {
-  return await axios.post('/api/auth/login', credentials);
+  return await axios.post('/auth/login', credentials);
 };
 
 export const register = async (userData) => {
-  return await axios.post('/api/auth/register', userData);
+  return await axios.post('/auth/register', userData);
 };
 

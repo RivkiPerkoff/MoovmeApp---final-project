@@ -1,4 +1,3 @@
-// client/src/components/LoadingIndicator.jsx
 import React from 'react';
 import './LoadingIndicator.css';
 

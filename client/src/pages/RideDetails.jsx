@@ -16,7 +16,7 @@ const RideDetails = () => {
   useEffect(() => {
     const fetchRide = async () => {
       try {
-        const res = await axios.get(`/api/rides/${id}`);
+        const res = await axios.get(`/rides/${id}`);
         setRide(res.data);
       } catch (err) {
         console.error('שגיאה בטעינת פרטי נסיעה:', err);
@@ -41,7 +41,7 @@ const handleRequest = async () => {
   };
 
   try {
-    const res = await axios.post(`/api/requests`, dataToSend);
+    const res = await axios.post(`/requests`, dataToSend);
     setMessage('✅ הבקשה נשלחה בהצלחה!');
   } catch (err) {
     console.error('❌ שגיאה בשליחת בקשה:', err);

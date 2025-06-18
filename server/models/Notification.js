@@ -5,7 +5,7 @@ const notificationSchema = new mongoose.Schema({
   message: { type: String, required: true },
   type: {
     type: String,
-    enum: ['system', 'message', 'status_update', 'ride_cancel', 'join_request','request_approved','join_cancelled','ride_updated'], // ← הוסף כאן את הערך החדש
+    enum: ['system', 'message', 'status_update', 'ride_cancel', 'join_request','request_approved','join_cancelled','ride_updated'], 
     default: 'system'
   },
   link_to: String,

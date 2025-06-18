@@ -1,6 +1,6 @@
 const Request = require('../models/Request');
 const Ride = require('../models/Ride');
-const User = require('../models/user');
+const User = require('../models/User');
 const Notification = require('../models/Notification');
 
 const getAllRequestsService = async () => {
@@ -20,7 +20,6 @@ const createRequestService = async ({ ride_id, passenger_id, seats_requested }) 
   });
 
   const savedRequest = await newRequest.save();
-
   const ride = await Ride.findById(ride_id).populate('driver_id', 'username');
   const passenger = await User.findById(passenger_id);
 

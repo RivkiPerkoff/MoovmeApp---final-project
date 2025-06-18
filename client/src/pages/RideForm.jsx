@@ -1,14 +1,14 @@
 import { useState, useContext, useEffect } from 'react';
 import axios from '../services/axiosInstance';
 import { AuthContext } from '../context/AuthContext';
-import './RideForm.css';
+import CitySelect from '../components/CitySelect';
 
+import './RideForm.css';
 
 const RideForm = ({ onClose, onRideAdded, initialRide = null }) => {
   const { user, token } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
-
     from_city: '',
     from_address: '',
     destination_city: '',
@@ -17,13 +17,11 @@ const RideForm = ({ onClose, onRideAdded, initialRide = null }) => {
     available_seats: '',
     notes: '',
     gender: 'נהג'
-
   });
 
   useEffect(() => {
     if (initialRide) {
       setFormData({
-
         from_city: initialRide.from_city || '',
         from_address: initialRide.from_address || '',
         destination_city: initialRide.destination_city || '',
@@ -32,18 +30,6 @@ const RideForm = ({ onClose, onRideAdded, initialRide = null }) => {
         available_seats: initialRide.available_seats || '',
         notes: initialRide.notes || '',
         gender: initialRide.gender || 'נהג'
-      });
-    } else {
-      // טופס חדש - אפס שדות
-      setFormData({
-        from_city: '',
-        from_address: '',
-        destination_city: '',
-        destination_address: '',
-        departure_time: '',
-        available_seats: '',
-        notes: '',
-        gender: 'נהג'
       });
     }
   }, [initialRide]);
@@ -67,21 +53,19 @@ const RideForm = ({ onClose, onRideAdded, initialRide = null }) => {
 
       let res;
       if (initialRide) {
-        // עריכה
-        res = await axios.put(`/api/rides/${initialRide._id}`, rideData, {
+        res = await axios.put(`/rides/${initialRide._id}`, rideData, {
           headers: { Authorization: `Bearer ${token}` }
         });
         alert('✏️ הנסיעה עודכנה בהצלחה');
         if (onRideAdded) {
           const fullRide = {
             ...res.data,
-            driver_id: user // להכניס את אובייקט המשתמש המקומי
+            driver_id: user
           };
           onRideAdded(fullRide);
         }
       } else {
-        // יצירה
-        res = await axios.post('/api/rides', rideData, {
+        res = await axios.post('/rides', rideData, {
           headers: { Authorization: `Bearer ${token}` }
         });
         alert('✅ נסיעה נוצרה בהצלחה');
@@ -95,34 +79,20 @@ const RideForm = ({ onClose, onRideAdded, initialRide = null }) => {
     }
   };
 
-  // מערך של ערים
-  const charediCities = [
-    "בני ברק", "ירושלים", "אלעד", "אחיסמך", "בית שמש", "מודיעין עילית", "ביתר עילית", "בית שמש",
-    "אשדוד", "צפת", "חיפה", "נתיבות", "קרית גת", "קרית מלאכי", "טבריה", "ערד",
-    "חצור הגלילית", "רכסים", "עמנואל", "ביתר", "חולון", "פתח תקווה",
-    "ראשון לציון", "אשקלון", "עפולה", "קרית יערים", "נוף הגליל",
-    "אופקים", "בית דגן", "גבעת זאב", "קרית ספר", "אחר"
-  ];
-
   return (
     <div>
       <h2>{initialRide ? '✏️ עריכת נסיעה' : 'פרסום נסיעה חדשה'}</h2>
       <form onSubmit={handleSubmit}>
-
         <div>
           <label>עיר מוצא:</label>
-          <select
+          <CitySelect
             name="from_city"
-            value={formData.from_city || ''}
+            value={formData.from_city}
             onChange={handleChange}
-            required
-          >
-            <option value="">בחר עיר</option>
-            {charediCities.map(city => (
-              <option key={city} value={city}>{city}</option>
-            ))}
-          </select>
+            placeholder="בחר עיר מוצא"
+          />
         </div>
+
         <div>
           <label>כתובת מוצא:</label>
           <input
@@ -133,33 +103,52 @@ const RideForm = ({ onClose, onRideAdded, initialRide = null }) => {
             required
           />
         </div>
+
         <div>
           <label>עיר יעד:</label>
-          <select
+          <CitySelect
             name="destination_city"
-            value={formData.destination_city || ''}
+            value={formData.destination_city}
             onChange={handleChange}
-            required
-          >
-            <option value="">בחר עיר</option>
-            {charediCities.map(city => (
-              <option key={city} value={city}>{city}</option>
-            ))}
-          </select>
+            placeholder="בחר עיר יעד"
+          />
         </div>
 
         <div>
           <label>כתובת יעד:</label>
-          <input type="text" name="destination_address" value={formData.destination_address} onChange={handleChange} required />
+          <input
+            type="text"
+            name="destination_address"
+            value={formData.destination_address}
+            onChange={handleChange}
+            required
+          />
         </div>
+
         <div>
           <label>זמן יציאה:</label>
-          <input type="datetime-local" name="departure_time" value={formData.departure_time} onChange={handleChange} required />
+          <input
+            type="datetime-local"
+            name="departure_time"
+            value={formData.departure_time}
+            onChange={handleChange}
+            required
+          />
         </div>
+
         <div>
           <label>מקומות פנויים:</label>
-          <input type="number" name="available_seats" value={formData.available_seats} min="1" max="20" onChange={handleChange} required />
+          <input
+            type="number"
+            name="available_seats"
+            value={formData.available_seats}
+            min="1"
+            max="20"
+            onChange={handleChange}
+            required
+          />
         </div>
+
         <div>
           <select
             name="gender"
@@ -172,9 +161,14 @@ const RideForm = ({ onClose, onRideAdded, initialRide = null }) => {
             <option value="נהגת">נהגת</option>
           </select>
         </div>
+
         <div>
           <label>הערות:</label>
-          <textarea name="notes" value={formData.notes} onChange={handleChange} />
+          <textarea
+            name="notes"
+            value={formData.notes}
+            onChange={handleChange}
+          />
         </div>
 
         <button type="submit">

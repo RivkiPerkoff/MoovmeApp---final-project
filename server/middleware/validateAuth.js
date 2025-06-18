@@ -1,6 +1,5 @@
 const { body, validationResult } = require('express-validator');
 
-// בדיקות להרשמה
 const validateRegister = [
   body('username').notEmpty().withMessage('שם משתמש נדרש'),
   body('email').isEmail().withMessage('יש להזין כתובת מייל תקינה'),
@@ -8,7 +7,6 @@ const validateRegister = [
     .isLength({ min: 6 }).withMessage('הסיסמה חייבת להכיל לפחות 6 תווים'),
   body('user_type').isIn(['user', 'admin']).withMessage('סוג משתמש לא חוקי'),
 
-  // שלב סופי – בדיקה אם יש שגיאות
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -18,7 +16,7 @@ const validateRegister = [
   }
 ];
 
-// בדיקות להתחברות
+
 const validateLogin = [
   body('email').isEmail().withMessage('כתובת מייל לא תקינה'),
   body('password').notEmpty().withMessage('יש להזין סיסמה'),

@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
   full_name: String,
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  user_type: { type: String, enum: ['user', 'admin'], default: 'user' }, // רק שני סוגים
+  user_type: { type: String, enum: ['user', 'admin'], default: 'user' },
   profile_img: String,
   audio: String,
   is_active: { type: Boolean, default: true }

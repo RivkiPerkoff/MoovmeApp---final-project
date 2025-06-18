@@ -1,7 +1,6 @@
 const Ride = require('../models/Ride');
 const Request = require('../models/Request');
 const Notification = require('../models/Notification');
-
 const getAllRidesService = async () => {
   return await Ride.find().populate('driver_id', '-password');
 };
@@ -27,7 +26,6 @@ const updateRideService = async (rideId, updateData) => {
   if (approvedRequests.length > 0) {
     const changeSummary = [];
 
-    // השוואת שעת יציאה (אם קיימת בעדכון)
     if (
       updateData.departure_time &&
       new Date(rideBeforeUpdate.departure_time).getTime() !== new Date(updateData.departure_time).getTime()
@@ -35,17 +33,14 @@ const updateRideService = async (rideId, updateData) => {
       changeSummary.push(`🕒 זמן היציאה שונה ל-${new Date(updateData.departure_time).toLocaleString('he-IL')}`);
     }
 
-    // השוואת עיר מוצא
     if (updateData.from_city && rideBeforeUpdate.from_city !== updateData.from_city) {
       changeSummary.push(`📍 עיר המוצא שונתה ל-${updateData.from_city}`);
     }
 
-    // השוואת עיר יעד
     if (updateData.destination_city && rideBeforeUpdate.destination_city !== updateData.destination_city) {
       changeSummary.push(`📍 עיר היעד שונתה ל-${updateData.destination_city}`);
     }
 
-    // השוואת מספר מקומות פנויים
     if (
       typeof updateData.available_seats !== 'undefined' &&
       rideBeforeUpdate.available_seats !== updateData.available_seats
@@ -53,10 +48,8 @@ const updateRideService = async (rideId, updateData) => {
       changeSummary.push(`🪑 מספר המקומות הפנויים עודכן ל-${updateData.available_seats}`);
     }
 
-    // אם באמת היה שינוי – שולחים התראות
     if (changeSummary.length > 0) {
       const messageText = `הנהג עדכן את פרטי הנסיעה מ-${updatedRide.from_city} ל-${updatedRide.destination_city}:\n${changeSummary.join('\n')}`;
-
       const notifications = approvedRequests.map(req => ({
         user_id: req.passenger_id,
         message: messageText,
@@ -68,10 +61,7 @@ const updateRideService = async (rideId, updateData) => {
       }));
 
       await Notification.insertMany(notifications);
-      console.log('📣 נשלחו התראות לנוסעים על עדכון נסיעה');
-    } else {
-      console.log('ℹ️ לא היו שינויים משמעותיים – לא נשלחו התראות');
-    }
+    } 
   }
 
   return updatedRide;
@@ -102,7 +92,6 @@ const deleteRideService = async (rideId, requesterId) => {
 
   await Request.deleteMany({ ride_id: ride._id });
   await ride.deleteOne();
-
   return { message: 'הנסיעה נמחקה בהצלחה' };
 };
 

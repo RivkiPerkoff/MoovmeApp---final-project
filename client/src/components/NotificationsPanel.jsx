@@ -7,7 +7,7 @@ const NotificationsPanel = ({ notifications, visibleToasts, showAll, onMarkAsSee
 
   const handleApprove = async (notif) => {
     try {
-      await axios.patch(`/api/requests/${notif.request_id}/approve`);
+      await axios.patch(`/requests/${notif.request_id}/approve`);
       await onMarkAsSeen(notif._id);
       if (refreshNotifications) refreshNotifications();
     } catch (err) {

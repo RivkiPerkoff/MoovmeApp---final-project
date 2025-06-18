@@ -7,9 +7,7 @@ const getAllNotificationsService = async () => {
 };
 
 const getNotificationsByUserService = async (userId) => {
-  console.log('📩 מבקש התראות עבור משתמש:', userId);
   const notifications = await Notification.find({ user_id: userId, is_read: false });
-  console.log('🔔 נמצאו התראות:', notifications);
   return notifications;
 };
 
@@ -31,7 +29,6 @@ const deleteRideService = async (rideId) => {
   if (!ride) throw new Error('Ride not found');
 
   const requests = await Request.find({ ride_id: rideId });
-
   for (const req of requests) {
     await Notification.create({
       user_id: req.user_id,
@@ -42,16 +39,13 @@ const deleteRideService = async (rideId) => {
       createdAt: new Date()
     });
   }
-
   await Request.deleteMany({ ride_id: rideId });
   await Ride.findByIdAndDelete(rideId);
-
   return { message: 'Ride and related requests deleted successfully' };
 };
 
 const sendRideCancelNotificationsService = async (rideId, senderId) => {
   const requests = await Request.find({ ride_id: rideId, status: 'approved' }).populate('passenger_id');
-
   const notifications = requests.map(req => ({
     user: req.passenger_id._id,
     message: 'הנסיעה אליה הצטרפת בוטלה על ידי הנהג.',

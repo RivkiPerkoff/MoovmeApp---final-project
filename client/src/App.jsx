@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import Layout from './components/Layout';
 import Home from './pages/Home';
@@ -9,12 +9,12 @@ import RideForm from './pages/RideForm';
 import RideDetails from './pages/RideDetails';
 import AdminDashboard from './pages/AdminDashboard';
 import MyJoinedRides from './pages/MyJoinedRides';
-
-import ProtectedRoute from './components/ProtectedRoute'; // ✅ חדש
-
+import ProtectedRoute from './components/ProtectedRoute';
+import { AuthContext } from './context/AuthContext';
 import './App.css';
 
 function App() {
+  const { user } = useContext(AuthContext);
   return (
     <Router>
       <Layout>
@@ -23,7 +23,6 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* נתיבים מוגנים */}
           <Route
             path="/home"
             element={
@@ -32,6 +31,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/ride/new"
             element={
@@ -40,6 +40,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/rides/:id"
             element={
@@ -48,14 +49,20 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/admin"
             element={
               <ProtectedRoute>
-                <AdminDashboard />
+                {user?.user_type === 'admin' ? (
+                  <AdminDashboard />
+                ) : (
+                  <Navigate to="/home" replace />
+                )}
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/my-joined-rides"
             element={

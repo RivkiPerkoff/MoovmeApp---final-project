@@ -6,7 +6,7 @@ import MessageBanner from '../components/MessageBanner';
 import './Register.css';
 
 const Register = () => {
-  const { loginUser } = useContext(AuthContext); // שינוי כאן
+  const { loginUser } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -26,17 +26,15 @@ const Register = () => {
       user_type: 'user'
     };
     try {
-      console.log("📤 נתונים שנשלחים לשרת:", dataToSend);
-      const res = await axios.post('/api/auth/register', dataToSend);
+      const res = await axios.post('/auth/register', dataToSend);
       const user = res.data.user || res.data;
       const token = res.data.token;
       if (token) localStorage.setItem('token', token);
       loginUser(user);
-      navigate('/Home');
+      navigate('/home', { replace: true });
     } catch (err) {
       console.error("❌ שגיאת שרת:", err.response?.data);
       if (err.response?.data?.errors) {
-        // נציג את השגיאות מהשרת - כל אחת בשורה נפרדת
         const errorMessages = err.response.data.errors.map(e => `• ${e.msg}`).join('\n');
         setMessage(`❌ שגיאות בטופס:\n${errorMessages}`);
       } else {
@@ -45,8 +43,6 @@ const Register = () => {
       setTimeout(() => setMessage(''), 5000);
     }
   };
-
-
 
   return (
     <div className="register-container">

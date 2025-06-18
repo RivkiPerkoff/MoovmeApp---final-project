@@ -12,7 +12,7 @@ const MyJoinedRides = () => {
     useEffect(() => {
         const fetchJoinedRides = async () => {
             try {
-                const res = await axios.get(`/api/requests/byPassenger/${user._id}`);
+                const res = await axios.get(`/requests/byPassenger/${user._id}`);
                 setRequests(res.data);
             } catch (err) {
                 console.error("שגיאה בשליפת הנסיעות שהצטרפתי אליהן:", err);
@@ -34,13 +34,13 @@ const handleCancelRequest = async () => {
     const { requestId, rideId, seatsRequested } = cancelData;
 
     try {
-        await axios.delete(`/api/requests/${requestId}`);
-        await axios.put(`/api/requests/${rideId}/increaseSeats`, {
+        await axios.delete(`/requests/${requestId}`);
+        await axios.put(`/requests/${rideId}/increaseSeats`, {
             seatsToAdd: seatsRequested
         });
         setRequests(prev => prev.filter(r => r._id !== requestId));
-        setShowConfirm(false); // סגירת המודאל לאחר הצלחה
-    } catch (error) {
+        setShowConfirm(false); 
+        } catch (error) {
         console.error("שגיאה בביטול הבקשה", error);
     }
 };

@@ -1,5 +1,4 @@
-
-import { useState, useContext ,useEffect} from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../services/axiosInstance';
 import { AuthContext } from '../context/AuthContext';
@@ -22,14 +21,13 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('/api/auth/login', { email, password });
+      const res = await axios.post('/auth/login', { email, password });
       const user = res.data.user || res.data;
       const token = res.data.token;
 
-      // בתוך handleLogin ב־Login.jsx
       if (token) sessionStorage.setItem('token', token);
       loginUser(user);
-      navigate('/home', { replace: true }); // ✅ שורה זו מונעת חזרה ללוגין
+      navigate('/home', { replace: true });
     } catch (err) {
       console.error(err);
       setMessage('❌ פרטי התחברות שגויים');
@@ -41,7 +39,6 @@ const Login = () => {
     <div className="login-container">
       <h2>התחברות</h2>
       <MessageBanner message={message} type="error" />
-
       <form onSubmit={handleLogin} className="login-form">
         <label>דוא"ל:</label>
         <input
