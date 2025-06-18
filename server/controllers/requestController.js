@@ -1,6 +1,6 @@
 const Request = require('../models/Request');
 const Ride = require('../models/Ride');
-const User = require('../models/user');
+const User = require('../models/User');
 const Notification = require('../models/Notification');
 const { updateAvailableSeats } = require('./rideController');
 
