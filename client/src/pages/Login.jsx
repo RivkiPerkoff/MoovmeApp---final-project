@@ -16,7 +16,7 @@
 //   const handleLogin = async (e) => {
 //     e.preventDefault();
 //     try {
-//       const res = await axios.post('/api/auth/login', { email, password });
+//       const res = await axios.post('/auth/login', { email, password });
 //       const user = res.data.user || res.data;
 //       const token = res.data.token;
 
@@ -78,7 +78,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('/api/auth/login', { email, password });
+      const res = await axios.post('/auth/login', { email, password });
       const user = res.data.user || res.data;
       const token = res.data.token;
 

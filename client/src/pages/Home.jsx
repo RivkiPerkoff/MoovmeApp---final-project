@@ -27,7 +27,7 @@ const Home = () => {
   useEffect(() => {
     const fetchRides = async () => {
       try {
-        const res = await axios.get('/api/rides');
+        const res = await axios.get('/rides');
         setAllRides(res.data);
       } catch (err) {
         console.error('שגיאה בשליפת נסיעות:', err);
@@ -150,7 +150,7 @@ const Home = () => {
           onMarkAsSeen={handleMarkAsSeen}
           refreshNotifications={() => {
             axios.get(`/api/notifications/byUser/${user._id}`).then(res => setNotifications(res.data));
-            axios.get('/api/rides').then(res => setAllRides(res.data));
+            axios.get('/rides').then(res => setAllRides(res.data));
           }}
         />
 

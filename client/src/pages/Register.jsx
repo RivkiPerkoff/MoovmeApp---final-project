@@ -22,7 +22,7 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('/api/auth/register', formData);
+      const res = await axios.post('/auth/register', formData);
       const user = res.data.user || res.data;
       const token = res.data.token;
 

@@ -15,7 +15,7 @@ const MyRequests = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const res = await axios.get('/api/requests/my');
+        const res = await axios.get('/requests/my');
         setRequests(res.data);
       } catch (err) {
         console.error('שגיאה בשליפת הבקשות שלי:', err);

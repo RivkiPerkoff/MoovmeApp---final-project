@@ -289,7 +289,6 @@
 // };
 
 // export default AdminDashboard;
-
 import React, { useEffect, useState, useContext } from 'react';
 import axios from '../services/axiosInstance';
 import './AdminDashboard.css';
@@ -317,7 +316,7 @@ const AdminDashboard = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('/api/users');
+      const res = await axios.get('/users');
       setUsers(res.data);
     } catch (err) {
       console.error('שגיאה בעת שליפת משתמשים:', err);
@@ -326,7 +325,7 @@ const AdminDashboard = () => {
 
   const fetchRides = async () => {
     try {
-      const res = await axios.get('/api/rides');
+      const res = await axios.get('/rides');
       setRides(res.data);
       fetchRequestsByRides(res.data);
     } catch (err) {
@@ -337,7 +336,7 @@ const AdminDashboard = () => {
   const fetchRequestsByRides = async (ridesList) => {
     const all = await Promise.all(
       ridesList.map(async (ride) => {
-        const res = await axios.get(`/api/requests/byRide/${ride._id}`);
+        const res = await axios.get(`/requests/byRide/${ride._id}`);
         return { rideId: ride._id, requests: res.data };
       })
     );
@@ -350,7 +349,7 @@ const AdminDashboard = () => {
 
   const approveRequest = async (requestId) => {
     try {
-      await axios.patch(`/api/requests/${requestId}`, { status: 'approved' });
+      await axios.patch(`/requests/${requestId}`, { status: 'approved' });
       fetchRides();
     } catch (err) {
       console.error('שגיאה באישור בקשה:', err);
@@ -359,7 +358,7 @@ const AdminDashboard = () => {
 
   const rejectRequest = async (requestId) => {
     try {
-      await axios.patch(`/api/requests/${requestId}`, { status: 'rejected' });
+      await axios.patch(`/requests/${requestId}`, { status: 'rejected' });
       fetchRides();
     } catch (err) {
       console.error('שגיאה בדחיית בקשה:', err);
@@ -376,11 +375,11 @@ const AdminDashboard = () => {
 
     try {
       if (confirmData.type === 'user') {
-        await axios.delete(`/api/users/${confirmData.id}`);
+        await axios.delete(`/users/${confirmData.id}`);
         setUsers(prev => prev.filter(u => u._id !== confirmData.id));
         setMessage('🗑️ המשתמש נמחק בהצלחה');
       } else if (confirmData.type === 'ride') {
-        await axios.delete(`/api/rides/${confirmData.id}`, {
+        await axios.delete(`/rides/${confirmData.id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }

@@ -13,7 +13,7 @@ const RideRequests = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const res = await axios.get('/api/requests/driver');
+        const res = await axios.get('/requests/driver');
         setRequestsByRide(res.data);
       } catch (err) {
         console.error('שגיאה בשליפת בקשות:', err);
