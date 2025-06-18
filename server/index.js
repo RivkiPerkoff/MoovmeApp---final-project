@@ -30,7 +30,7 @@ mongoose.connect(process.env.MONGO_URI, {
 .catch(err => console.error('❌ MongoDB connection error:', err));
 
 // 2. Load all models
-require('./models/user');
+require('./models/User');
 require('./models/Ride');
 require('./models/Request');
 require('./models/Payment');
