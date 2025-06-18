@@ -7,15 +7,11 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middlewares
-// app.use(cors({
-//   origin: 'http://localhost:3000',
-// }));
 app.use(cors());
-
 app.use(express.json());
 
 // 1. Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -27,7 +23,14 @@ mongoose.connect(process.env.MONGO_URI, {
     console.log(`🚀 Server is running on port ${PORT}`);
   });
 })
-.catch(err => console.error('❌ MongoDB connection error:', err));
+.catch(err => {
+  console.error('❌ MongoDB connection error:', err);
+
+  // Even if DB fails, still start the server so Render detects the port
+  app.listen(PORT, () => {
+    console.log(`⚠️ Server is listening on port ${PORT} without DB`);
+  });
+});
 
 // 2. Load all models
 require('./models/User');
@@ -50,7 +53,6 @@ const messageRoutes = require('./routes/messages');
 const reportRoutes = require('./routes/reports');
 const authRoutes = require('./routes/auth');
 
-
 // 4. Use routes
 app.use('/api/users', userRoutes);
 app.use('/api/rides', rideRoutes);
@@ -62,9 +64,7 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/auth', authRoutes);
 
-
 // 5. Root route
 app.get('/', (req, res) => {
   res.send('🚗 Ride Sharing API is running!');
 });
-
