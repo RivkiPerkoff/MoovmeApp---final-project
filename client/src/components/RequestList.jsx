@@ -9,7 +9,7 @@ const RequestList = ({ requests }) => {
       <ul>
         {requests.map((req) => (
           <li key={req._id}>
-            {req.passenger_id.username} ביקש {req.seats_requested} מקומות - סטטוס: {req.status}
+            {req.passenger_id.username} ביקש {req.seats_requested} מקומות
           </li>
         ))}
       </ul>

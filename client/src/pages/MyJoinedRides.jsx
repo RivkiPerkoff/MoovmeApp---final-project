@@ -61,7 +61,7 @@ const handleCancelRequest = async () => {
                     return (
                         <React.Fragment key={req._id}>
                             <div className="ride-card">
-                                <h3>מ: {ride?.from} ל: {ride?.to}</h3>
+                                <h3>מ: {ride?.from_city} ל: {ride?.destination_city}</h3>
                                 <p><span className="info-bold">תאריך:</span> {new Date(ride?.departure_time).toLocaleString()}</p>
                                 <p><span className="info-bold">מקומות שתפסת:</span> {req.seats_requested}</p>
                                 <p><span className="info-bold">הערות:</span> {ride?.notes || 'אין הערות'}</p>

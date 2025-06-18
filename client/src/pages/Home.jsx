@@ -24,7 +24,14 @@ const Home = () => {
   const unreadCount = notifications.filter(n => !n.seen && !n.is_read).length;
   const [showAllNotifications, setShowAllNotifications] = useState(false);
   const [filterParams, setFilterParams] = useState(null);
+  const [showFilter, setShowFilter] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchRides = async () => {
@@ -40,15 +47,7 @@ const Home = () => {
     fetchRides();
   }, []);
 
-  const now = new Date();
 
-  const myRides = allRides.filter(
-    ride => ride.driver_id?._id === user?._id && new Date(ride.departure_time) > now
-  );
-
-  const otherRides = allRides.filter(
-    ride => ride.driver_id?._id !== user?._id && new Date(ride.departure_time) > now
-  );
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -97,6 +96,19 @@ const Home = () => {
       }
     });
   }, [notifications]);
+
+  const now = new Date();
+
+  const myRides = allRides.filter(
+    ride =>
+      (ride.driver_id === user?._id || ride.driver_id?._id === user?._id) &&
+      new Date(ride.departure_time) > now
+  );
+
+
+  const otherRides = allRides.filter(
+    ride => ride.driver_id?._id !== user?._id && new Date(ride.departure_time) > now
+  );
 
   const handleMarkAsSeen = async (notificationId) => {
     try {
@@ -166,7 +178,20 @@ const Home = () => {
         />
 
         <div className="container-flex">
-          <RideFilter onFilter={setFilterParams} />
+          {/* <RideFilter onFilter={setFilterParams} /> */}
+          <div className="ride-filter-wrapper">
+            <div className="filter-desktop">
+              <RideFilter onFilter={setFilterParams} />
+            </div>
+
+            <div className="filter-mobile">
+              <button className="filter-toggle-btn" onClick={() => setShowFilter(prev => !prev)}>
+                🔍 סינון
+              </button>
+              {showFilter && <RideFilter onFilter={setFilterParams} />}
+            </div>
+          </div>
+
 
           <div className="main-content">
             <h1>ברוך הבא{user ? `, ${user.username}` : ''}!</h1>
@@ -227,12 +252,16 @@ const Home = () => {
                     initialRide={rideToEdit}
                     onRideAdded={(newRide) => {
                       if (rideToEdit) {
+                        // אם ערכנו נסיעה קיימת — נעדכן אותה ברשימת כל הנסיעות
                         setAllRides((prev) =>
                           prev.map(r => r._id === newRide._id ? newRide : r)
                         );
                       } else {
-                        setAllRides((prev) => [...prev, newRide]);
+                        // אם זו נסיעה חדשה — נוסיף אותה לרשימה, אבל תוצג רק ב"נסיעות שלי"
+                        setAllRides(prev => [...prev, newRide]);
+                        setShowMyRides(true);
                       }
+
                       setShowForm(false);
                       setRideToEdit(null);
                     }}

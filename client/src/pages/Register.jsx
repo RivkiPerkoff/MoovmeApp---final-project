@@ -21,20 +21,32 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    const dataToSend = {
+      ...formData,
+      user_type: 'user'
+    };
     try {
-      const res = await axios.post('/api/auth/register', formData);
+      console.log("📤 נתונים שנשלחים לשרת:", dataToSend);
+      const res = await axios.post('/api/auth/register', dataToSend);
       const user = res.data.user || res.data;
       const token = res.data.token;
-
       if (token) localStorage.setItem('token', token);
-      loginUser(user); // שימוש בפונקציה הנכונה
+      loginUser(user);
       navigate('/Home');
     } catch (err) {
-      console.error(err);
-      setMessage('❌ ההרשמה נכשלה, נסה שוב');
-      setTimeout(() => setMessage(''), 3000);
+      console.error("❌ שגיאת שרת:", err.response?.data);
+      if (err.response?.data?.errors) {
+        // נציג את השגיאות מהשרת - כל אחת בשורה נפרדת
+        const errorMessages = err.response.data.errors.map(e => `• ${e.msg}`).join('\n');
+        setMessage(`❌ שגיאות בטופס:\n${errorMessages}`);
+      } else {
+        setMessage('email already exists');
+      }
+      setTimeout(() => setMessage(''), 5000);
     }
   };
+
+
 
   return (
     <div className="register-container">

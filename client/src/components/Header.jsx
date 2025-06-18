@@ -9,7 +9,7 @@ const Header = () => {
 
   const handleLogout = () => {
     logoutUser();
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
   return (
@@ -40,12 +40,14 @@ const Header = () => {
             <span className="username">שלום, {user.username}</span>
             <button className="logout-btn" onClick={handleLogout}>התנתק</button>
           </>
-        ) : (
+        ) 
+        : (
           <>
             <Link to="/login">התחבר</Link>
             <Link to="/register">הרשמה</Link>
           </>
-        )}
+        )
+        }
       </nav>
     </header>
   );

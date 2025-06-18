@@ -17,7 +17,7 @@ const RideForm = ({ onClose, onRideAdded, initialRide = null }) => {
     available_seats: '',
     notes: '',
     gender: 'נהג'
-    
+
   });
 
   useEffect(() => {
@@ -25,7 +25,7 @@ const RideForm = ({ onClose, onRideAdded, initialRide = null }) => {
       setFormData({
 
         from_city: initialRide.from_city || '',
-        from_address: initialRide.from_address || '',    
+        from_address: initialRide.from_address || '',
         destination_city: initialRide.destination_city || '',
         destination_address: initialRide.destination_address || '',
         departure_time: initialRide.departure_time?.slice(0, 16) || '',
@@ -72,7 +72,13 @@ const RideForm = ({ onClose, onRideAdded, initialRide = null }) => {
           headers: { Authorization: `Bearer ${token}` }
         });
         alert('✏️ הנסיעה עודכנה בהצלחה');
-        if (onRideAdded) onRideAdded(res.data); // מתפקד גם כעדכון
+        if (onRideAdded) {
+          const fullRide = {
+            ...res.data,
+            driver_id: user // להכניס את אובייקט המשתמש המקומי
+          };
+          onRideAdded(fullRide);
+        }
       } else {
         // יצירה
         res = await axios.post('/api/rides', rideData, {
@@ -91,18 +97,18 @@ const RideForm = ({ onClose, onRideAdded, initialRide = null }) => {
 
   // מערך של ערים
   const charediCities = [
-    "בני ברק", "ירושלים", "אלעד","אחיסמך","בית שמש", "מודיעין עילית", "ביתר עילית", "בית שמש",
+    "בני ברק", "ירושלים", "אלעד", "אחיסמך", "בית שמש", "מודיעין עילית", "ביתר עילית", "בית שמש",
     "אשדוד", "צפת", "חיפה", "נתיבות", "קרית גת", "קרית מלאכי", "טבריה", "ערד",
     "חצור הגלילית", "רכסים", "עמנואל", "ביתר", "חולון", "פתח תקווה",
     "ראשון לציון", "אשקלון", "עפולה", "קרית יערים", "נוף הגליל",
-     "אופקים", "בית דגן", "גבעת זאב", "קרית ספר", "אחר"
+    "אופקים", "בית דגן", "גבעת זאב", "קרית ספר", "אחר"
   ];
 
   return (
     <div>
       <h2>{initialRide ? '✏️ עריכת נסיעה' : 'פרסום נסיעה חדשה'}</h2>
       <form onSubmit={handleSubmit}>
- 
+
         <div>
           <label>עיר מוצא:</label>
           <select
@@ -119,28 +125,28 @@ const RideForm = ({ onClose, onRideAdded, initialRide = null }) => {
         </div>
         <div>
           <label>כתובת מוצא:</label>
-          <input 
-            type="text" 
-            name="from_address" 
-            value={formData.from_address} 
-            onChange={handleChange} 
-            required 
+          <input
+            type="text"
+            name="from_address"
+            value={formData.from_address}
+            onChange={handleChange}
+            required
           />
         </div>
-     <div>
-  <label>עיר יעד:</label>
-  <select
-    name="destination_city"
-    value={formData.destination_city || ''}
-    onChange={handleChange}
-    required
-  >
-    <option value="">בחר עיר</option>
-    {charediCities.map(city => (
-      <option key={city} value={city}>{city}</option>
-    ))}
-  </select>
-</div>
+        <div>
+          <label>עיר יעד:</label>
+          <select
+            name="destination_city"
+            value={formData.destination_city || ''}
+            onChange={handleChange}
+            required
+          >
+            <option value="">בחר עיר</option>
+            {charediCities.map(city => (
+              <option key={city} value={city}>{city}</option>
+            ))}
+          </select>
+        </div>
 
         <div>
           <label>כתובת יעד:</label>
@@ -152,7 +158,7 @@ const RideForm = ({ onClose, onRideAdded, initialRide = null }) => {
         </div>
         <div>
           <label>מקומות פנויים:</label>
-          <input type="number" name="available_seats" value={formData.available_seats} min="1" max="20" onChange={handleChange} required  />
+          <input type="number" name="available_seats" value={formData.available_seats} min="1" max="20" onChange={handleChange} required />
         </div>
         <div>
           <select

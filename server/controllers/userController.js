@@ -1,19 +1,86 @@
-const User = require('../models/user');
+// const User = require('../models/user');
 
-// Get all users
+// // Get all users
+// const getAllUsers = async (req, res) => {
+//   try {
+//     const users = await User.find();
+//     res.json(users);
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
+
+// // Get one user
+// const getUserById = async (req, res) => {
+//   try {
+//     const user = await User.findById(req.params.id);
+//     if (!user) return res.status(404).json({ message: 'User not found' });
+//     res.json(user);
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
+
+// // Create user
+// const createUser = async (req, res) => {
+//   const newUser = new User(req.body);
+//   try {
+//     const savedUser = await newUser.save();
+//     res.status(201).json(savedUser);
+//   } catch (err) {
+//     res.status(400).json({ message: err.message });
+//   }
+// };
+
+// // Update user
+// const updateUser = async (req, res) => {
+//   try {
+//     const updated = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+//     if (!updated) return res.status(404).json({ message: 'User not found' });
+//     res.json(updated);
+//   } catch (err) {
+//     res.status(400).json({ message: err.message });
+//   }
+// };
+
+// // Delete user
+// const deleteUser = async (req, res) => {
+//   try {
+//     const deleted = await User.findByIdAndDelete(req.params.id);
+//     if (!deleted) return res.status(404).json({ message: 'User not found' });
+//     res.json({ message: 'User deleted' });
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
+
+// module.exports = {
+//   getAllUsers,
+//   getUserById,
+//   createUser,
+//   updateUser,
+//   deleteUser,
+// };
+const {
+  getAllUsersService,
+  getUserByIdService,
+  createUserService,
+  updateUserService,
+  deleteUserService
+} = require('../services/userService');
+
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await getAllUsersService();
     res.json(users);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// Get one user
 const getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await getUserByIdService(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (err) {
@@ -21,21 +88,18 @@ const getUserById = async (req, res) => {
   }
 };
 
-// Create user
 const createUser = async (req, res) => {
-  const newUser = new User(req.body);
   try {
-    const savedUser = await newUser.save();
+    const savedUser = await createUserService(req.body);
     res.status(201).json(savedUser);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
 
-// Update user
 const updateUser = async (req, res) => {
   try {
-    const updated = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updated = await updateUserService(req.params.id, req.body);
     if (!updated) return res.status(404).json({ message: 'User not found' });
     res.json(updated);
   } catch (err) {
@@ -43,10 +107,9 @@ const updateUser = async (req, res) => {
   }
 };
 
-// Delete user
 const deleteUser = async (req, res) => {
   try {
-    const deleted = await User.findByIdAndDelete(req.params.id);
+    const deleted = await deleteUserService(req.params.id);
     if (!deleted) return res.status(404).json({ message: 'User not found' });
     res.json({ message: 'User deleted' });
   } catch (err) {

@@ -7,11 +7,8 @@ const NotificationsPanel = ({ notifications, visibleToasts, showAll, onMarkAsSee
 
   const handleApprove = async (notif) => {
     try {
-      // קריאה ל-API לאישור הבקשה
       await axios.patch(`/api/requests/${notif.request_id}/approve`);
-      // סימון ההתראה כנקראה
       await onMarkAsSeen(notif._id);
-      // רענון ההתראות (אם צריך)
       if (refreshNotifications) refreshNotifications();
     } catch (err) {
       console.error('שגיאה באישור הבקשה:', err);
