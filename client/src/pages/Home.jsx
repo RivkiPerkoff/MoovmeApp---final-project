@@ -3,8 +3,6 @@ import axios from '../services/axiosInstance';
 import { AuthContext } from '../context/AuthContext';
 import RideForm from './RideForm';
 import RideList from '../components/RideList';
-import MessageBanner from '../components/MessageBanner';
-import LoadingIndicator from '../components/LoadingIndicator';
 import NotificationsPanel from '../components/NotificationsPanel';
 import RideFilter from '../components/RideFilter';
 import { useNavigate } from 'react-router-dom';
@@ -116,20 +114,11 @@ const Home = () => {
         data: { userId: user._id }
       });
       setAllRides((prev) => prev.filter((ride) => ride._id !== rideId));
-      setMessage('✅ הנסיעה נמחקה בהצלחה.');
+      setMessage('✅ הנסיעה נמחקה בהצלחה');
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
       console.error('שגיאה במחיקת נסיעה:', err);
-      if (err.response) {
-        console.error('Response data:', err.response.data);
-        console.error('Response status:', err.response.status);
-        console.error('Response headers:', err.response.headers);
-      } else if (err.request) {
-        console.error('Request:', err.request);
-      } else {
-        console.error('Error message:', err.message);
-      }
-      setMessage('❌ שגיאה במחיקת נסיעה.');
+      setMessage('❌ שגיאה במחיקת נסיעה');
       setTimeout(() => setMessage(''), 3000);
     }
   };
@@ -189,11 +178,10 @@ const Home = () => {
               </button>
             </div>
 
-            <MessageBanner message={message} type={message.includes('❌') ? 'error' : 'success'} />
             <hr />
 
             {loading ? (
-              <LoadingIndicator />
+              <p>טוען...</p>
             ) : (
               <>
                 {showMyRides && (
@@ -243,6 +231,11 @@ const Home = () => {
           </div>
         </div>
       </div>
+
+      {/* Toast Success Message */}
+      {message && (
+        <div className="simple-toast">{message}</div>
+      )}
     </div>
   );
 };

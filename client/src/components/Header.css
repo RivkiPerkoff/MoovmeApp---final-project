@@ -9,6 +9,7 @@
   top: 0;
   z-index: 1000;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  direction: rtl; /* מאפשר לוגו בצד ימין */
 }
 
 .logo a {
@@ -20,8 +21,24 @@
 
 .nav-links {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 1.2rem;
+  width: 100%;
+}
+
+/* צד ימין – ברירת מחדל ל"שלום משתמש" */
+.username {
+  margin-inline-end: auto;
+  font-weight: bold;
+  padding-inline-start: 1rem;
+}
+
+/* צד שמאל – כל שאר הכפתורים */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-inline-start: auto;
 }
 
 .nav-links a {
@@ -35,10 +52,7 @@
   color: #cce0ff;
 }
 
-.username {
-  margin-inline-end: 0.75rem;
-}
-
+/* כפתור התנתקות */
 .logout-btn {
   padding: 0.5rem 1rem;
   background-color: #ff4d4d;
@@ -54,13 +68,58 @@
   background-color: #cc0000;
 }
 
+/* כפתור ניהול מערכת / חזרה לבית */
+.nav-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 999px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  margin-inline-start: 0.5rem;
+}
+
+.admin-btn {
+  background-color: #007bff;
+}
+
+.admin-btn:hover {
+  background-color: #0056b3;
+}
+
+.home-btn {
+  background-color: #28a745;
+}
+
+.home-btn:hover {
+  background-color: #1e7e34;
+}
+
+/* רספונסיביות */
 @media (max-width: 768px) {
   .nav-links {
-    flex-wrap: wrap;
-    justify-content: flex-end;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
+
+  .nav-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .main-header {
     flex-direction: column;
     align-items: flex-start;
   }
+
+.username {
+  margin-inline-end: auto;
+  font-weight: 700  !important;
+  padding-inline-start: 1rem  !important;
+  font-size: 1.2rem !important;
+  color: #ffe600 !important; /* צבע צהוב בולט */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
 }

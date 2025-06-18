@@ -1,6 +1,7 @@
 const Ride = require('../models/Ride');
 const Request = require('../models/Request');
 const Notification = require('../models/Notification');
+const jwt = require('jsonwebtoken');
 
 // Get all rides
 const getAllRides = async (req, res) => {
@@ -23,6 +24,7 @@ const getRideById = async (req, res) => {
   }
 };
 
+// Create ride
 const createRide = async (req, res) => {
   try {
     const rideData = {
@@ -48,25 +50,28 @@ const updateRide = async (req, res) => {
   }
 };
 
-// Delete ride and notify passengers
+// Delete ride with permission check
 const deleteRide = async (req, res) => {
   try {
     const ride = await Ride.findById(req.params.id);
-    if (!ride) {
-      return res.status(404).json({ message: 'נסיעה לא נמצאה' });
-    }
+    if (!ride) return res.status(404).json({ message: 'נסיעה לא נמצאה' });
 
-    const requesterId = req.body.userId;
-    if (!requesterId || ride.driver_id.toString() !== requesterId) {
+    // אימות הטוקן מה-Authorization Header
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ message: 'לא סופק טוקן' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const requesterId = decoded.id;
+    const isAdmin = decoded.user_type === 'admin';
+
+    if (!isAdmin && ride.driver_id.toString() !== requesterId) {
       return res.status(403).json({ message: 'אין הרשאה למחוק נסיעה זו' });
     }
 
-    // שלב 1: מציאת כל הבקשות שאושרו לנסיעה זו
-    console.log('🔍 מחפש בקשות עבור הנסיעה:', ride._id);
+    // שלב 1: מציאת בקשות שאושרו
     const requests = await Request.find({ ride_id: ride._id, status: 'approved' });
-    console.log('🔔 בקשות שאושרו:', requests);
 
-    // שלב 2: שליחת התראה לכל נוסע שאושר
+    // שלב 2: שליחת התראות לנוסעים
     if (requests.length > 0) {
       const notifications = requests.map(req => ({
         user_id: req.user_id,
@@ -78,20 +83,19 @@ const deleteRide = async (req, res) => {
         link_to: `/rides/${ride._id}`
       }));
       await Notification.insertMany(notifications);
-      console.log('✅ נשלחו התראות לנוסעים');
-    } else {
-      console.log('ℹ️ לא נמצאו בקשות להצטרפות. לא נשלחו התראות.');
     }
 
-    // שלב 3: מחיקת הנסיעה עצמה
+    // שלב 3: מחיקת הנסיעה
     await ride.deleteOne();
     res.status(200).json({ message: 'הנסיעה נמחקה בהצלחה' });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'שגיאה במחיקת נסיעה' });
   }
 };
 
+// Increase seats
 const increaseSeats = async (req, res) => {
   const rideId = req.params.id;
   const { seatsToAdd } = req.body;
@@ -111,6 +115,7 @@ const increaseSeats = async (req, res) => {
   }
 };
 
+// Utility for internal seat update
 const updateAvailableSeats = async (rideId, change) => {
   const ride = await Ride.findById(rideId);
   if (!ride) throw new Error('Ride not found');
@@ -127,5 +132,5 @@ module.exports = {
   updateRide,
   deleteRide,
   increaseSeats,
-  updateAvailableSeats,
+  updateAvailableSeats
 };
