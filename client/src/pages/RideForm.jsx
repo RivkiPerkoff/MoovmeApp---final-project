@@ -68,7 +68,7 @@ const RideForm = ({ onClose, onRideAdded, initialRide = null }) => {
         res = await axios.post('/rides', rideData, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        alert('✅ נסיעה נוצרה בהצלחה');
+        alert('נסיעה נוצרה בהצלחה');
         if (onRideAdded) onRideAdded(res.data);
       }
 

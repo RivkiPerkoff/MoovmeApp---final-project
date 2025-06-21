@@ -33,10 +33,10 @@ const Register = () => {
       loginUser(user);
       navigate('/home', { replace: true });
     } catch (err) {
-      console.error("❌ שגיאת שרת:", err.response?.data);
+      console.error(" שגיאת שרת:", err.response?.data);
       if (err.response?.data?.errors) {
         const errorMessages = err.response.data.errors.map(e => `• ${e.msg}`).join('\n');
-        setMessage(`❌ שגיאות בטופס:\n${errorMessages}`);
+        setMessage(` שגיאות בטופס:\n${errorMessages}`);
       } else {
         setMessage('email already exists');
       }

@@ -30,7 +30,7 @@ const Login = () => {
       navigate('/home', { replace: true });
     } catch (err) {
       console.error(err);
-      setMessage('❌ פרטי התחברות שגויים');
+      setMessage(' פרטי התחברות שגויים');
       setTimeout(() => setMessage(''), 3000);
     }
   };

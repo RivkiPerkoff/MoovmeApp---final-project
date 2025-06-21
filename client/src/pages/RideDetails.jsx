@@ -20,7 +20,7 @@ const RideDetails = () => {
         setRide(res.data);
       } catch (err) {
         console.error('שגיאה בטעינת פרטי נסיעה:', err);
-        setMessage('❌ שגיאה בטעינת פרטי נסיעה');
+        setMessage(' שגיאה בטעינת פרטי נסיעה');
       } finally {
         setLoading(false);
       }
@@ -30,7 +30,7 @@ const RideDetails = () => {
 
 const handleRequest = async () => {
   if (!user || !user._id || !ride || !ride._id) {
-    setMessage('🔒 יש להתחבר כדי לשלוח בקשה');
+    setMessage(' יש להתחבר כדי לשלוח בקשה');
     return;
   }
 
@@ -42,10 +42,10 @@ const handleRequest = async () => {
 
   try {
     const res = await axios.post(`/requests`, dataToSend);
-    setMessage('✅ הבקשה נשלחה בהצלחה!');
+    setMessage(' הבקשה נשלחה בהצלחה!');
   } catch (err) {
-    console.error('❌ שגיאה בשליחת בקשה:', err);
-    setMessage('❌ שגיאה בשליחת בקשה');
+    console.error(' שגיאה בשליחת בקשה:', err);
+    setMessage('שגיאה בשליחת בקשה');
   }
   setTimeout(() => setMessage(''), 3000);
 };

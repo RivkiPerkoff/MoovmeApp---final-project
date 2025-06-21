@@ -14,16 +14,16 @@ mongoose.connect(process.env.MONGO_URI, {
   useUnifiedTopology: true
 })
 .then(() => {
-  console.log('✅ Connected to MongoDB');
+  console.log('Connected to MongoDB');
   app.listen(PORT, () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
   });
 })
 .catch(err => {
-  console.error('❌ MongoDB connection error:', err);
+  console.error('MongoDB connection error:', err);
 
   app.listen(PORT, () => {
-    console.log(`⚠️ Server is listening on port ${PORT} without DB`);
+    console.log(` Server is listening on port ${PORT} without DB`);
   });
 });
 
